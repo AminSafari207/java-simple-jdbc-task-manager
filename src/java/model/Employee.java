@@ -19,6 +19,18 @@ public class Employee {
     }
 
     public Employee(int id, String firstName, String lastName) {
+        if (firstName == null || lastName == null) {
+            throw new NullPointerException("firstName or lastName can not be null.'");
+        }
+
+        if (firstName.trim().isEmpty() || lastName.trim().isEmpty()) {
+            throw new IllegalArgumentException("firstName or lastName can not be empty strings.");
+        }
+
+        if (id < 0) {
+            throw new IllegalArgumentException("id should be higher than 0.");
+        }
+
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
