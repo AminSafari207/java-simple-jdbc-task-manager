@@ -5,7 +5,8 @@ set search_path to public;
 create table employee (
     id serial primary key,
     first_name varchar,
-    last_name varchar
+    last_name varchar,
+    email varchar
 );
 
 create table task (
@@ -20,3 +21,5 @@ create table assigned_tasks (
     employee_id int references employee(id) on delete cascade,
     task_id int references task(id) on delete cascade
 );
+
+drop database task_manager;
