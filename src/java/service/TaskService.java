@@ -1,6 +1,6 @@
 package service;
 
-import exception.TaskUpdateParamException;
+import exception.UpdateTaskParamsException;
 import model.Task;
 import utils.ValidationUtils;
 
@@ -12,7 +12,7 @@ import java.util.Map;
 public class TaskService {
     private final List<String> validUpdateKeys = List.of("title", "description", "estimated_hours");
 
-    public Task createTask(Task task) {
+    public Task persistTaskInDatabase(Task task) {
         if (task == null) {
             throw new NullPointerException("task must not be null.");
         }
@@ -49,7 +49,7 @@ public class TaskService {
         }
     }
 
-    public List<Task> createTask(List<Task> tasks) {
+    public List<Task> persistTaskInDatabase(List<Task> tasks) {
         if (tasks == null) {
             throw new NullPointerException("tasks list must not be null.");
         }
@@ -100,9 +100,13 @@ public class TaskService {
         return createdTasks;
     }
 
-    public void updateTask(Task task, Map<String, Object> updates) {
+    public void updateTaskInDatabase(Task task, Map<String, Object> updates, List<String> validKeys) {
         if (updates == null || updates.isEmpty()) {
-            throw new TaskUpdateParamException("'updates' parameter must not be null or empty.");
+            throw new UpdateTaskParamsException("'updates' parameter must not be null or empty.");
+        }
+
+        if (validKeys.isEmpty()) {
+            throw new UpdateTaskParamsException("'validKeys' must not be empty.");
         }
 
         String sqlQuery = "UPDATE task SET ";
@@ -110,7 +114,7 @@ public class TaskService {
 
         for (String key: updates.keySet()) {
             if (!validUpdateKeys.contains(key)) {
-                throw new TaskUpdateParamException("'updates' parameter key is not valid: '" + key + "'");
+                throw new UpdateTaskParamsException("'updates' parameter key is not valid: '" + key + "'");
             }
 
             sqlQuery += key + " = ?";
@@ -129,12 +133,7 @@ public class TaskService {
 
             for (String key: updates.keySet()) {
                 Object value = updates.get(key);
-
                 ps.setObject(idIndex++, value);
-
-                if (key.equals("title")) task.setTitle((String) value);
-                if (key.equals("description")) task.setDescription((String) value);
-                if (key.equals("estimated_hours")) task.setEstimatedHours((int) value);
             }
 
             ps.setInt(idIndex, task.getId());
@@ -144,7 +143,7 @@ public class TaskService {
         }
     }
 
-    public void deleteTask(int taskId) {
+    public void removeTaskFromDatabase(int taskId) {
         ValidationUtils.validateId(taskId);
 
         String sqlQuery = "DELETE FROM task WHERE id = ?";
