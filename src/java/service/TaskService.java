@@ -1,14 +1,16 @@
 package service;
 
-import model.Task;
-import model.TaskId;
+import exception.TaskUpdateParamException;
 import model.Task;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class TaskService {
+    private final List<String> validUpdateKeys = List.of("title", "description", "estimated_hours");
+
     public Task createTask(Task task) {
         if (task == null) {
             throw new NullPointerException("task must not be null.");
@@ -91,9 +93,54 @@ public class TaskService {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException("Error creating tasks in batch", e);
+            throw new RuntimeException("Error updating tasks in batch", e);
         }
 
         return createdTasks;
     }
+
+    public void updateTask(Task task, Map<String, Object> updates) {
+        if (updates == null || updates.isEmpty()) {
+            throw new TaskUpdateParamException("'updates' parameter must not be null or empty.");
+        }
+
+        String sqlQuery = "UPDATE task SET ";
+        int updateCount = 0;
+
+        for (String key: updates.keySet()) {
+            if (!validUpdateKeys.contains(key)) {
+                throw new TaskUpdateParamException("'updates' parameter key is not valid: '" + key + "'")
+            }
+
+            sqlQuery += key + " = ?";
+            updateCount++;
+
+            if (updateCount < updates.size()) sqlQuery += ", ";
+        }
+
+        sqlQuery += " WHERE id = ?";
+
+        try (
+            Connection connection = DBConnection.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sqlQuery)
+        ) {
+            int idIndex = 1;
+
+            for (String key: updates.keySet()) {
+                Object value = updates.get(key);
+
+                ps.setObject(idIndex++, value);
+
+                if (key.equals("title")) task.setTitle((String) value);
+                if (key.equals("description")) task.setDescription((String) value);
+                if (key.equals("estimated_hours")) task.setEstimatedHours((int) value);
+            }
+
+            ps.setInt(idIndex, task.getId());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }
