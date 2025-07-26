@@ -14,4 +14,12 @@ public class ValidationUtils {
             throw new IllegalArgumentException(logName + " can not be empty strings.");
         }
     }
+
+    public static void validateString(String logName, String str, int minLength) {
+        validateString(logName, str);
+
+        if (str.trim().length() < minLength) {
+            throw new IllegalArgumentException(logName + " must have at least " + minLength + " characters.");
+        }
+    }
 }

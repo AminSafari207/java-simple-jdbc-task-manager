@@ -9,8 +9,8 @@ public class Task {
     private int estimatedHours;
 
     public Task(String title, String description, int estimatedHours) {
-        ValidationUtils.validateString("title", title);
-        ValidationUtils.validateString("description", description);
+        ValidationUtils.validateString("title", title, 3);
+        ValidationUtils.validateString("description", description, 16);
         validateEstimatedTime(estimatedHours);
 
         this.title = title;
@@ -20,8 +20,8 @@ public class Task {
 
     public Task(int id, String title, String description, int estimatedHours) {
         ValidationUtils.validateId(id);
-        ValidationUtils.validateString("title", title);
-        ValidationUtils.validateString("description", description);
+        ValidationUtils.validateString("title", title, 3);
+        ValidationUtils.validateString("description", description, 6);
         validateEstimatedTime(estimatedHours);
 
         this.id = id;
