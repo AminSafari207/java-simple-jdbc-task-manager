@@ -9,6 +9,10 @@ import java.util.List;
 
 public class EmployeeService {
     public Employee createEmployee(Employee employee) {
+        if (employee == null) {
+            throw new NullPointerException("employee must not be null.");
+        }
+
         String sqlQuery = "INSERT INTO employee (first_name, last_name, email) VALUES (?, ?, ?)";
 
         try (
@@ -42,6 +46,10 @@ public class EmployeeService {
     }
 
     public List<Employee> createEmployee(List<Employee> employees) {
+        if (employees == null) {
+            throw new NullPointerException("employees list must not be null.");
+        }
+
         String sqlQuery = "INSERT INTO employee (first_name, last_name, email) VALUES (?, ?, ?)";
         List<Employee> createdEmployees = new ArrayList<>();
 
@@ -50,6 +58,10 @@ public class EmployeeService {
                 PreparedStatement ps = connection.prepareStatement(sqlQuery, Statement.RETURN_GENERATED_KEYS)
         ) {
             for (Employee employee : employees) {
+                if (employee == null) {
+                    throw new NullPointerException("employee must not be null.");
+                }
+
                 String firstName = employee.getFirstName();
                 String lastName = employee.getLastName();
                 String email = employee.getEmail();
@@ -83,6 +95,4 @@ public class EmployeeService {
 
         return createdEmployees;
     }
-
-
 }
