@@ -3,7 +3,7 @@ package model;
 import utils.ValidationUtils;
 
 public class Employee {
-    private int id;
+    private EmployeeId id;
     private String firstName;
     private String lastName;
 
@@ -15,8 +15,8 @@ public class Employee {
         this.lastName = lastName;
     }
 
-    public Employee(int id, String firstName, String lastName) {
-        ValidationUtils.validateId(id);
+    public Employee(EmployeeId id, String firstName, String lastName) {
+        ValidationUtils.validateId(id.getId());
         ValidationUtils.validateString("firstName", firstName, 3);
         ValidationUtils.validateString("lastName", lastName, 3);
 
@@ -25,7 +25,7 @@ public class Employee {
         this.lastName = lastName;
     }
 
-    public int getId() {
+    public EmployeeId getId() {
         return id;
     }
 
