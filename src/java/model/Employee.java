@@ -8,8 +8,8 @@ public class Employee {
     private String lastName;
 
     public Employee(String firstName, String lastName) {
-        ValidationUtils.validateString("firstName", firstName);
-        ValidationUtils.validateString("lastName", lastName);
+        ValidationUtils.validateString("firstName", firstName, 3);
+        ValidationUtils.validateString("lastName", lastName, 3);
 
         this.firstName = firstName;
         this.lastName = lastName;
@@ -17,8 +17,8 @@ public class Employee {
 
     public Employee(int id, String firstName, String lastName) {
         ValidationUtils.validateId(id);
-        ValidationUtils.validateString("firstName", firstName);
-        ValidationUtils.validateString("lastName", lastName);
+        ValidationUtils.validateString("firstName", firstName, 3);
+        ValidationUtils.validateString("lastName", lastName, 3);
 
         this.id = id;
         this.firstName = firstName;
