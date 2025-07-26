@@ -63,4 +63,17 @@ public class Task {
     public void setEstimatedHours(int estimatedHours) {
         this.estimatedHours = estimatedHours;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Task other = (Task) obj;
+        return this.id == other.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Integer.hashCode(id);
+    }
 }

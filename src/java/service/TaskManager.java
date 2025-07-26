@@ -85,6 +85,23 @@ public class TaskManager {
         });
     }
 
+    public void removeTask(int taskId) {
+        ValidationUtils.validateId(taskId);
+
+        Task foundTask = findTaskById(taskId);
+
+        if (foundTask == null) throw new TaskNotFoundException(taskId);
+
+        ts.removeTaskFromDatabase(taskId);
+        removeTaskFromMemory(foundTask);
+    }
+
+    private void removeTaskFromMemory(Task task) {
+        this.tasksList.remove(task);
+        this.unassignedTasks.remove(task);
+        this.assignedTasks.values().forEach(list -> list.removeIf(t -> t.getId() == task.getId()));
+    }
+
     public Task findTaskById(int taskId) {
         ValidationUtils.validateId(taskId);
         for (Task task: tasksList) if (task.getId() == taskId) return task;
