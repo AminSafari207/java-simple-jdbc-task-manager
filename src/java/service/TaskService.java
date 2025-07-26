@@ -61,7 +61,7 @@ public class TaskService {
         return createdTasks;
     }
 
-    public void updateTaskInDatabase(Task task, Map<String, Object> updates, List<String> validKeys) {
+    public void updateTaskInDatabase(int taskId, Map<String, Object> updates, List<String> validKeys) {
         if (updates == null || updates.isEmpty()) {
             throw new UpdateTaskParamsException("'updates' parameter must not be null or empty.");
         }
@@ -74,7 +74,7 @@ public class TaskService {
         int updateCount = 0;
 
         for (String key: updates.keySet()) {
-            if (!validUpdateKeys.contains(key)) {
+            if (!validKeys.contains(key)) {
                 throw new UpdateTaskParamsException("'updates' parameter key is not valid: '" + key + "'");
             }
 
@@ -97,7 +97,7 @@ public class TaskService {
                 ps.setObject(idIndex++, value);
             }
 
-            ps.setInt(idIndex, task.getId());
+            ps.setInt(idIndex, taskId);
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);

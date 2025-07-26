@@ -2,10 +2,12 @@ package service;
 
 import exception.EmployeeIdException;
 import exception.EmployeesListException;
+import exception.TaskNotFoundException;
 import exception.TasksMapException;
 import model.Employee;
 import model.EmployeeId;
 import model.Task;
+import utils.ValidationUtils;
 
 import java.sql.*;
 import java.util.*;
@@ -14,13 +16,17 @@ public class TaskManager {
     private final EmployeeService es = new EmployeeService();
     private final TaskService ts = new TaskService();
 
-    private final List<Task> unassignedTasks;
     private final Map<EmployeeId, Employee> employees;
+    private final List<Task> tasksList;
+    private final List<Task> unassignedTasks;
     private final Map<EmployeeId, List<Task>> assignedTasks;
 
+    private final List<String> validUpdateTaskKeys = List.of("title", "description", "estimated_hours");
+
     public TaskManager() {
-        this.unassignedTasks = new ArrayList<>();
         this.employees = new HashMap<>();
+        this.tasksList = new ArrayList<>();
+        this.unassignedTasks = new ArrayList<>();
         this.assignedTasks = new HashMap<>();
     }
 
@@ -47,10 +53,12 @@ public class TaskManager {
         ts.persistTaskInDatabase((List<Task>) tasksMap.values());
 
         tasksMap.forEach((employeeId, task) -> {
-            if (employeeId == null)  throw new NullPointerException("employeeId must not be null.";
+            if (employeeId == null) throw new NullPointerException("employeeId must not be null.");
             if (task == null) throw new NullPointerException("task must not be null.");
 
             int id = employeeId.getId();
+
+            this.tasksList.add(task);
 
             if (id == -1) {
                 this.unassignedTasks.add(task);
@@ -59,6 +67,28 @@ public class TaskManager {
 
             this.assignedTasks.get(employeeId).add(task);
         });
+    }
+
+    public void updateTask(int taskId, Map<String, Object> updates) {
+        ValidationUtils.validateId(taskId);
+
+        Task foundTask = findTaskById(taskId);
+
+        if (foundTask == null) throw new TaskNotFoundException(taskId);
+
+        ts.updateTaskInDatabase(taskId, updates, validUpdateTaskKeys);
+
+        updates.forEach((k, v) -> {
+            if (k.equals("title")) foundTask.setTitle((String) v);
+            if (k.equals("description")) foundTask.setDescription((String) v);
+            if (k.equals("estimated_hours")) foundTask.setEstimatedHours((int) v);
+        });
+    }
+
+    public Task findTaskById(int taskId) {
+        ValidationUtils.validateId(taskId);
+        for (Task task: tasksList) if (task.getId() == taskId) return task;
+        return null;
     }
 
 }
