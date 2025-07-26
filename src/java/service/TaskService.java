@@ -2,6 +2,7 @@ package service;
 
 import exception.TaskUpdateParamException;
 import model.Task;
+import utils.ValidationUtils;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -109,7 +110,7 @@ public class TaskService {
 
         for (String key: updates.keySet()) {
             if (!validUpdateKeys.contains(key)) {
-                throw new TaskUpdateParamException("'updates' parameter key is not valid: '" + key + "'")
+                throw new TaskUpdateParamException("'updates' parameter key is not valid: '" + key + "'");
             }
 
             sqlQuery += key + " = ?";
@@ -143,4 +144,19 @@ public class TaskService {
         }
     }
 
+    public void deleteTask(int taskId) {
+        ValidationUtils.validateId(taskId);
+
+        String sqlQuery = "DELETE FROM task WHERE id = ?";
+
+        try (
+                Connection connection = DBConnection.getConnection();
+                PreparedStatement ps = connection.prepareStatement(sqlQuery)
+        ) {
+            ps.setInt(1, taskId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
