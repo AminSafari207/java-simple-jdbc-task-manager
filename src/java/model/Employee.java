@@ -1,35 +1,24 @@
 package model;
 
+import utils.ValidationUtils;
+
 public class Employee {
     private int id;
     private String firstName;
     private String lastName;
 
     public Employee(String firstName, String lastName) {
-        if (firstName == null || lastName == null) {
-            throw new NullPointerException("firstName or lastName can not be null.'");
-        }
-
-        if (firstName.trim().isEmpty() || lastName.trim().isEmpty()) {
-            throw new IllegalArgumentException("firstName or lastName can not be empty strings.");
-        }
+        ValidationUtils.validateString("firstName", firstName);
+        ValidationUtils.validateString("lastName", lastName);
 
         this.firstName = firstName;
         this.lastName = lastName;
     }
 
     public Employee(int id, String firstName, String lastName) {
-        if (firstName == null || lastName == null) {
-            throw new NullPointerException("firstName or lastName can not be null.'");
-        }
-
-        if (firstName.trim().isEmpty() || lastName.trim().isEmpty()) {
-            throw new IllegalArgumentException("firstName or lastName can not be empty strings.");
-        }
-
-        if (id < 0) {
-            throw new IllegalArgumentException("id should be higher than 0.");
-        }
+        ValidationUtils.validateId(id);
+        ValidationUtils.validateString("firstName", firstName);
+        ValidationUtils.validateString("lastName", lastName);
 
         this.id = id;
         this.firstName = firstName;
