@@ -1,15 +1,14 @@
 package service;
 
+import exception.EmployeeIdException;
 import exception.EmployeesListException;
+import exception.TasksMapException;
 import model.Employee;
 import model.EmployeeId;
 import model.Task;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TaskManager {
     private final EmployeeService es = new EmployeeService();
@@ -38,7 +37,28 @@ public class TaskManager {
             }
 
             this.employees.put(employee.getId(), employee);
+            this.assignedTasks.put(employee.getId(), new ArrayList<>());
         }
+    }
+
+    public void registerTask(Map<EmployeeId, Task> tasksMap) {
+        if (tasksMap == null || tasksMap.isEmpty()) throw new TasksMapException("tasksMap must not be null or empty.");
+
+        ts.persistTaskInDatabase((List<Task>) tasksMap.values());
+
+        tasksMap.forEach((employeeId, task) -> {
+            if (employeeId == null)  throw new NullPointerException("employeeId must not be null.";
+            if (task == null) throw new NullPointerException("task must not be null.");
+
+            int id = employeeId.getId();
+
+            if (id == -1) {
+                this.unassignedTasks.add(task);
+                return;
+            }
+
+            this.assignedTasks.get(employeeId).add(task);
+        });
     }
 
 }
