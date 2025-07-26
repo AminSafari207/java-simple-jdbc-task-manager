@@ -10,48 +10,9 @@ import java.util.List;
 import java.util.Map;
 
 public class TaskService {
-    private final List<String> validUpdateKeys = List.of("title", "description", "estimated_hours");
-
-    public Task persistTaskInDatabase(Task task) {
-        if (task == null) {
-            throw new NullPointerException("task must not be null.");
-        }
-
-        String sqlQuery = "INSERT INTO task (title, description, estimated_hours) VALUES (?, ?, ?)";
-
-        try (
-                Connection connection = DBConnection.getConnection();
-                PreparedStatement ps = connection.prepareStatement(sqlQuery, Statement.RETURN_GENERATED_KEYS);
-        ) {
-            String title = task.getTitle();
-            String description = task.getDescription();
-            int estimatedHours = task.getEstimatedHours();
-
-            ps.setString(1, title);
-            ps.setString(2, description);
-            ps.setInt(3, estimatedHours);
-            ps.executeUpdate();
-
-            try (ResultSet rs = ps.getGeneratedKeys()) {
-                if (rs.next()) {
-                    return new Task(
-                            rs.getInt(1),
-                            title,
-                            description,
-                            estimatedHours
-                    );
-                } else {
-                    throw new SQLException("Failed to retrieve generated task ID.");
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public List<Task> persistTaskInDatabase(List<Task> tasks) {
-        if (tasks == null) {
-            throw new NullPointerException("tasks list must not be null.");
+        if (tasks == null || tasks.isEmpty()) {
+            throw new NullPointerException("tasks list must not be null or empty.");
         }
 
         String sqlQuery = "INSERT INTO task (title, description, estimated_hours) VALUES (?, ?, ?)";

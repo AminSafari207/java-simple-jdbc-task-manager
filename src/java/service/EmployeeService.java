@@ -8,44 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EmployeeService {
-    public Employee createEmployee(Employee employee) {
-        if (employee == null) {
-            throw new NullPointerException("employee must not be null.");
-        }
-
-        String sqlQuery = "INSERT INTO employee (first_name, last_name, email) VALUES (?, ?, ?)";
-
-        try (
-                Connection connection = DBConnection.getConnection();
-                PreparedStatement ps = connection.prepareStatement(sqlQuery, Statement.RETURN_GENERATED_KEYS);
-        ) {
-            String firstName = employee.getFirstName();
-            String lastName = employee.getLastName();
-            String email = employee.getEmail();
-
-            ps.setString(1, firstName);
-            ps.setString(2, lastName);
-            ps.setString(3, email);
-            ps.executeUpdate();
-
-            try (ResultSet rs = ps.getGeneratedKeys()) {
-                if (rs.next()) {
-                    return new Employee(
-                            new EmployeeId(rs.getInt(1)),
-                            firstName,
-                            lastName,
-                            email
-                    );
-                } else {
-                    throw new SQLException("Failed to retrieve generated employee ID.");
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public List<Employee> createEmployee(List<Employee> employees) {
+    public List<Employee> persistEmployeeInDatabase(List<Employee> employees) {
         if (employees == null) {
             throw new NullPointerException("employees list must not be null.");
         }
