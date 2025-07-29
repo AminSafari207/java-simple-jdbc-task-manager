@@ -5,6 +5,7 @@ import service.EmployeeService;
 import service.TaskManager;
 import service.TaskService;
 import utils.SqlUtils;
+import utils.TaskUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -40,5 +41,40 @@ public class Main {
                 6, 1,
                 7, 3
         ).forEach((task, employeeId) -> tm.assignTask(new EmployeeId(employeeId), task));
+
+        tm.removeTask(5);
+        tm.updateTask(6, Map.of(
+                "estimated_hours", 14,
+                "title", "Fix Startup Logo Flicker"
+        ));
+
+        List<Task> tasksList = tm.getTasksList();
+        List<Task> filteredTasks = TaskUtils.filterTasks(tasksList, task -> task.getEstimatedHours() > 10);
+        List<String> summarizedTasks = TaskUtils.summarizeTasks(tasksList, task -> "'" + task.getTitle() + "': " + task.getEstimatedHours() + "h");
+
+        System.out.println("------------------------");
+        System.out.println("---- Filtered Tasks ----");
+        System.out.println("------------------------");
+        System.out.println();
+
+        TaskUtils.printTasks(filteredTasks, task -> {
+            System.out.println(task.toString());
+            System.out.println();
+            System.out.println("------------------------");
+            System.out.println();
+        });
+
+        System.out.println();
+        System.out.println("------------------------");
+        System.out.println("---- Filtered Tasks ----");
+        System.out.println("------------------------");
+        System.out.println();
+
+        summarizedTasks.forEach(summarizedTask -> {
+            System.out.println(summarizedTask);
+            System.out.println();
+            System.out.println("------------------------");
+            System.out.println();
+        });
     }
 }
