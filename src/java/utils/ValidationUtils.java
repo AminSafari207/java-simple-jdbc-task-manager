@@ -1,5 +1,7 @@
 package utils;
 
+import java.util.List;
+
 public class ValidationUtils {
     public static void validateId(int id) {
         if (id < 0) throw new IllegalArgumentException("id must 0 or positive.");
@@ -21,5 +23,10 @@ public class ValidationUtils {
         if (str.trim().length() < minLength) {
             throw new IllegalArgumentException(logName + " must have at least " + minLength + " characters.");
         }
+    }
+
+    public static void validateList(List<Object> list, String listName) {
+        if (list == null) throw new NullPointerException("'" + listName + "' can not be null.");
+        if (list.isEmpty()) throw new NullPointerException("'" + listName + "' can not be empty.");
     }
 }

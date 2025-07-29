@@ -1,9 +1,6 @@
 package service;
 
-import exception.EmployeeIdException;
-import exception.EmployeesListException;
-import exception.TaskNotFoundException;
-import exception.TasksMapException;
+import exception.*;
 import model.Employee;
 import model.EmployeeId;
 import model.Task;
@@ -47,26 +44,26 @@ public class TaskManager {
         }
     }
 
-    public void registerTask(Map<EmployeeId, Task> tasksMap) {
-        if (tasksMap == null || tasksMap.isEmpty()) throw new TasksMapException("tasksMap must not be null or empty.");
+    public void registerTasks(List<Task> tasks) {
+        if (tasks == null) throw new NullPointerException("'tasks' can not be null.");
+        if (tasks.isEmpty()) throw new NullPointerException("'tasks' can not be empty.");
 
-        ts.persistTaskInDatabase((List<Task>) tasksMap.values());
+        List<Task> persistedTasks = ts.persistTaskInDatabase(tasks);
+        tasksList.addAll(persistedTasks);
+        unassignedTasks.addAll(persistedTasks);
+    }
 
-        tasksMap.forEach((employeeId, task) -> {
-            if (employeeId == null) throw new NullPointerException("employeeId must not be null.");
-            if (task == null) throw new NullPointerException("task must not be null.");
+    public void assignTask(int taskId, EmployeeId employeeId) {
+        ValidationUtils.validateId(taskId);
+        ValidationUtils.validateId(employeeId.getId());
 
-            int id = employeeId.getId();
+        Task task = findTaskById(taskId);
 
-            this.tasksList.add(task);
+        if (task == null) throw new TaskNotFoundException(taskId);
+        if (!employees.containsKey(employeeId)) throw new EmployeeNotFoundException(employeeId);
 
-            if (id == -1) {
-                this.unassignedTasks.add(task);
-                return;
-            }
-
-            this.assignedTasks.get(employeeId).add(task);
-        });
+        assignedTasks.get(employeeId).add(task);
+        unassignedTasks.remove(task);
     }
 
     public void updateTask(int taskId, Map<String, Object> updates) {
@@ -101,6 +98,8 @@ public class TaskManager {
         this.unassignedTasks.remove(task);
         this.assignedTasks.values().forEach(list -> list.removeIf(t -> t.getId() == task.getId()));
     }
+
+
 
     public Task findTaskById(int taskId) {
         ValidationUtils.validateId(taskId);
