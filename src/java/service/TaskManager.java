@@ -12,6 +12,7 @@ import java.util.*;
 public class TaskManager {
     private final EmployeeService es = new EmployeeService();
     private final TaskService ts = new TaskService();
+    private final AssignmentService as = new AssignmentService();
 
     private final Map<EmployeeId, Employee> employees;
     private final List<Task> tasksList;
@@ -53,7 +54,7 @@ public class TaskManager {
         unassignedTasks.addAll(persistedTasks);
     }
 
-    public void assignTask(int taskId, EmployeeId employeeId) {
+    public void assignTask(EmployeeId employeeId, int taskId) {
         ValidationUtils.validateId(taskId);
         ValidationUtils.validateId(employeeId.getId());
 
@@ -62,6 +63,7 @@ public class TaskManager {
         if (task == null) throw new TaskNotFoundException(taskId);
         if (!employees.containsKey(employeeId)) throw new EmployeeNotFoundException(employeeId);
 
+        as.persistTaskAssignmentInDatabase(employeeId.getId(), taskId);
         assignedTasks.get(employeeId).add(task);
         unassignedTasks.remove(task);
     }
@@ -99,12 +101,25 @@ public class TaskManager {
         this.assignedTasks.values().forEach(list -> list.removeIf(t -> t.getId() == task.getId()));
     }
 
-
-
     public Task findTaskById(int taskId) {
         ValidationUtils.validateId(taskId);
         for (Task task: tasksList) if (task.getId() == taskId) return task;
         return null;
     }
 
+    public Map<EmployeeId, Employee> getEmployees() {
+        return employees;
+    }
+
+    public List<Task> getTasksList() {
+        return tasksList;
+    }
+
+    public List<Task> getUnassignedTasks() {
+        return unassignedTasks;
+    }
+
+    public Map<EmployeeId, List<Task>> getAssignedTasks() {
+        return assignedTasks;
+    }
 }

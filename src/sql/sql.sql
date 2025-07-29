@@ -22,4 +22,8 @@ create table assigned_tasks (
     task_id int references task(id) on delete cascade
 );
 
+
+-------------------------------------------
+
+truncate table assigned_tasks, task, employee restart identity cascade;
 drop database task_manager;
